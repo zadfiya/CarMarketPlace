@@ -13,5 +13,4 @@ public class Auction
     public DateTime AuctionEndDate {get; set;} = DateTime.Now;
     public Status Status { get; set; }
     public Item Item { get; set; }
-
 }
