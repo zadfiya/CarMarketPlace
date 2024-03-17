@@ -12,5 +12,12 @@ builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
 app.MapControllers();
+try{
+    DBInitializer.InitDb(app);
+}
+catch (Exception e)
+{
+    Console.WriteLine(e.Message);
+}
 app.Run();
 
