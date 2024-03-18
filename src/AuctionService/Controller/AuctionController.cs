@@ -41,4 +41,20 @@ public class AuctionController : ControllerBase
         
         return _mapper.Map<AuctionDto>(auction);
     }
+
+    [HttpPost]
+    public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto auctionDto)
+    {
+        var auction = _mapper.Map<Auction>(auctionDto);
+
+        await _context.Auctions.AddAsync(auction);
+
+        var result = await _context.SaveChangesAsync() > 0;
+
+        if(!result)
+            return BadRequest("Unable to save Data in DB");
+        
+        return CreatedAtAction(nameof(GetAuctionById), new {auction.Id}, _mapper.Map<AuctionDto>(auction));
+
+    }
 }
