@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Reflection;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,4 +58,48 @@ public class AuctionController : ControllerBase
         return CreatedAtAction(nameof(GetAuctionById), new {auction.Id}, _mapper.Map<AuctionDto>(auction));
 
     }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult> UpdateAuctionById(Guid id,UpdateAuctionDto auctionDto)
+    {
+        var auction = await _context.Auctions
+                            .Include(x=>x.Item)
+                            .FirstOrDefaultAsync(x=>x.Id==id);
+
+        if(auction==null)
+            return NotFound();
+        // Get all properties of UpdateAuctionDto
+        auction.Item.Color = auctionDto.Color ?? auction.Item.Color;
+        auction.Item.Model= auctionDto.Model?? auction.Item.Model;
+        auction.Item.Year = auctionDto.Year ?? auction.Item.Year;
+        auction.Item.Make= auctionDto.Make?? auction.Item.Make;
+        auction.Item.Mileage = auctionDto.Mileage ?? auction.Item.Mileage;
+        auction.Item.ImageUrl= auctionDto.ImageUrl?? auction.Item.ImageUrl;
+        auction.ReservedPrice = auctionDto.ReservedPrice ?? auction.ReservedPrice;
+        auction.AuctionEndDate = auctionDto.AuctionEndDate?? auction.AuctionEndDate;         
+        var result = await _context.SaveChangesAsync()>0;
+        if(!result)
+            BadRequest("unable to update Auction Details");
+    
+        return Ok(_mapper.Map<AuctionDto>(auction));
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteAuctionById(Guid id)
+    {
+        var auction = await _context.Auctions.FirstOrDefaultAsync(x=>x.Id==id);
+
+        if(auction == null)
+            return NotFound();
+
+         _context.Auctions.Remove(auction);
+
+         var result = await _context.SaveChangesAsync() > 0;
+         if(!result)
+            return BadRequest("Unable to Delete Auction from DB");
+
+        return Ok();
+        
+    }
+
 }
