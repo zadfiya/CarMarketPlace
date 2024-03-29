@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using AutoMapper;
+using Contracts;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,11 +13,13 @@ public class AuctionController : ControllerBase
 {
     private readonly AuctionDBContext _context;
     private readonly IMapper _mapper;
+    private readonly IPublishEndpoint _publishEndpoint;
 
-    public AuctionController(AuctionDBContext context, IMapper mapper)
+    public AuctionController(AuctionDBContext context, IMapper mapper, IPublishEndpoint publishEndpoint)
     {
         _context = context;
         _mapper = mapper;
+        _publishEndpoint = publishEndpoint;
     }
 
     [HttpGet]
@@ -51,11 +55,12 @@ public class AuctionController : ControllerBase
         await _context.Auctions.AddAsync(auction);
 
         var result = await _context.SaveChangesAsync() > 0;
-
+        var newAuctionDto =  _mapper.Map<AuctionDto>(auction);
+        await _publishEndpoint.Publish(_mapper.Map<AuctionCreated>(newAuctionDto));
         if(!result)
             return BadRequest("Unable to save Data in DB");
         
-        return CreatedAtAction(nameof(GetAuctionById), new {auction.Id}, _mapper.Map<AuctionDto>(auction));
+        return CreatedAtAction(nameof(GetAuctionById), new {auction.Id},newAuctionDto);
 
     }
 
