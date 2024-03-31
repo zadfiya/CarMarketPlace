@@ -12,6 +12,11 @@ builder.Services.AddMassTransit(x=>{
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false)); // Set the default endpoint name formatter used for endpoint names.
 
     x.UsingRabbitMq( (context,cfg) =>{
+            cfg.ReceiveEndpoint("search-auction-created", e =>{
+                e.UseMessageRetry(r=>r.Interval(5,5)); // Retry is configured once for each message type, and is added prior to the consumer factory or saga repository in the pipeline.
+
+                e.ConfigureConsumer<AuctionCreatedConsumer>(context);
+            });
             //Configure the endpoints for all defined consumer, saga, and activity types using an optional endpoint name formatter. 
             //If no endpoint name formatter is specified and an IEndpointNameFormatter is registered in the container, it is resolved from the container. 
             //Otherwise, the DefaultEndpointNameFormatter is used.
