@@ -81,12 +81,14 @@ public class AuctionController : ControllerBase
         auction.Item.Mileage = auctionDto.Mileage ?? auction.Item.Mileage;
         auction.Item.ImageUrl= auctionDto.ImageUrl?? auction.Item.ImageUrl;
         auction.ReservedPrice = auctionDto.ReservedPrice ?? auction.ReservedPrice;
-        auction.AuctionEndDate = auctionDto.AuctionEndDate?? auction.AuctionEndDate;         
+        auction.AuctionEndDate = auctionDto.AuctionEndDate?? auction.AuctionEndDate;
+        var updateAuctionDTO = _mapper.Map<AuctionDto>(auction);  
+        await _publishEndpoint.Publish(_mapper.Map<AuctionUpdated>(updateAuctionDTO));       
         var result = await _context.SaveChangesAsync()>0;
         if(!result)
             BadRequest("unable to update Auction Details");
     
-        return Ok(_mapper.Map<AuctionDto>(auction));
+        return Ok(updateAuctionDTO);
     }
 
     [HttpDelete("{id}")]
