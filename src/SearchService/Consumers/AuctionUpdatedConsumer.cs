@@ -32,7 +32,7 @@ public class AuctionUpdatedConsumer : IConsumer<AuctionUpdated>
                             .ExecuteAsync();
 
         if(!result.IsAcknowledged)
-            throw new Exception("MongoDB not Ipdated with the Instance --> "+ context.Message.Id);
+            throw new MessageException(typeof(AuctionUpdated),"MongoDB not Ipdated with the Instance --> "+ context.Message.Id);
 
     }
 }
