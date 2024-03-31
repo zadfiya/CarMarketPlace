@@ -99,6 +99,8 @@ public class AuctionController : ControllerBase
         if(auction == null)
             return NotFound();
 
+        await _publishEndpoint.Publish(new {Id = id});
+
          _context.Auctions.Remove(auction);
 
          var result = await _context.SaveChangesAsync() > 0;
