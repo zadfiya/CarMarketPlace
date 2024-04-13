@@ -9,12 +9,12 @@ public class RegisterViewModel
     [Required]
     public string Password { get; set; }
     [Required]
-    public string UserName { get; set; }
+    public string Username { get; set; }
     [Required]
     public string FullName { get; set; }
     [Required]
-    public int Button { get; set; }
+    public string Button { get; set; }
     [Required]
-    public int ReturnUrl { get; set; }
+    public string ReturnUrl { get; set; }
 
 }
