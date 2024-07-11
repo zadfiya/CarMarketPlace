@@ -10,20 +10,19 @@ namespace IdentityServer.Pages.Register
 {
     [SecurityHeaders]
     [AllowAnonymous]
-    public class IndexModel : PageModel
+    public class Index : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        public Index (UserManager<ApplicationUser> userManager)
+        {
+            _userManager = userManager;
+        }
 
         [BindProperty]
         public RegisterViewModel Input {get;set;}
 
         [BindProperty]
         public bool RegisterSuccess {get;set;}
-
-        public Index(UserManager<ApplicationUser> userManager)
-        {
-            _userManager = userManager;
-        }
 
         public IActionResult OnGet(string returnUrl)
         {
@@ -36,7 +35,7 @@ namespace IdentityServer.Pages.Register
         }
         public async Task<IActionResult> OnPost()
         {
-            if(Input.Button == "Register") return Redirect("~/");
+            if(Input.Button != "Register") return Redirect("~/");
 
             if(ModelState.IsValid)
             {
@@ -48,6 +47,7 @@ namespace IdentityServer.Pages.Register
                 };
 
                 var result = await _userManager.CreateAsync(user, Input.Password);
+                Console.WriteLine(result.Errors);
                 
                 if(result.Succeeded)
                 {
@@ -59,6 +59,8 @@ namespace IdentityServer.Pages.Register
                     RegisterSuccess = true;
 
                 }
+
+
             }
 
             return Page();

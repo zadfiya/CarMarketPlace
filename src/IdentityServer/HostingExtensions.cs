@@ -20,6 +20,15 @@ internal static class HostingExtensions
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
+        builder.Services.AddCors(options=>
+        {
+            options.AddPolicy(name:"CORSPolicy", policy =>
+            {
+                policy.AllowAnyOrigin().AllowAnyMethod()
+                .AllowAnyHeader();
+            });
+        });
+
         builder.Services
             .AddIdentityServer(options =>
             {
@@ -57,6 +66,7 @@ internal static class HostingExtensions
         app.UseRouting();
         app.UseIdentityServer();
         app.UseAuthorization();
+        app.UseCors("CORSPolicy");
         
         app.MapRazorPages()
             .RequireAuthorization();
